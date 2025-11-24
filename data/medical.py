@@ -57,8 +57,20 @@ class HeartFailurePredictionDataset(DataModule):
         self.val_dataset = TensorDataset(*[self.splits[x][1] for x in self.splits])
 
 
-    def prepare_batch(self, *X):
-        return X
+    def prepare_batch(self, X, device="cpu"):
+        age, sex, cpt, rbp, cho, fbs, recg, mhr, exa, olp, sts = X
+        age = (age.to(device).reshape(-1, 1) - self.stats["Age"]["mean"]) / self.stats["Age"]["std"]
+        sex = sex.to(device).flatten().int()
+        cpt = cpt.to(device).flatten().int()
+        rbp = (rbp.to(device).reshape(-1, 1) - self.stats["RestingBP"]["mean"]) / self.stats["RestingBP"]["std"]
+        cho = (cho.to(device).reshape(-1, 1) - self.stats["Cholesterol"]["mean"]) / self.stats["Cholesterol"]["std"]
+        fbs = fbs.to(device).flatten().int()
+        recg = recg.to(device).flatten().int()
+        mhr = (mhr.to(device).reshape(-1, 1) - self.stats["MaxHR"]["mean"]) / self.stats["MaxHR"]["std"]
+        exa = exa.to(device).flatten().int()
+        olp = (olp.to(device).reshape(-1, 1) - self.stats["Oldpeak"]["mean"]) / self.stats["Oldpeak"]["std"]
+        sts = sts.to(device).flatten().int()
+        return age, sex, cpt, rbp, cho, fbs, recg, mhr, exa, olp, sts
 
     def train_dataloader(self):
         """
